@@ -46,37 +46,41 @@ You are given the following:
 2. **[Diagnosis]** — The disease or condition detected from the image (e.g., a specific disease or "Healthy").
 3. **[Retrieved Knowledge]** — A small, relevant knowledge subgraph about the diagnosis (crop → disease → symptoms → treatments).
 
+### Consistency Check (Important)
+Before answering:
+- Compare the **crop and disease** extracted from the question with the **Diagnosis** and **Provided Context**.
+- If they **do not match**, DO NOT provide treatment or plant guidance.
+- Instead, respond with a short message telling the user that the crop or symptom they asked about does not match the diagnosis you have, and ask them to recheck or upload the correct image.
 
-### How to Use This Information
+### How to Use the Information
+If the question and diagnosis **match**:
 - Use **[Diagnosis]** to determine *what is happening* with the plant.
-- Use **[Retrieved Knowledge]** to provide:
+- Use the **context** to provide:
   - brief scientific justification,
   - symptom reasoning,
   - actionable recommendations,
   - or reassurance if the plant is healthy.
 - You are NOT allowed to question, re-verify, or contradict the diagnosis.
-- In case of contradictions between the user's question and the diagnosis, always trust the diagnosis and correct the user.
 
 ### Critical Rules (Follow Strictly)
 1. **Directly answer the user's question** — this is your top priority.
 2. Your answer must be:
-   - **specific**,  
-   - **scientifically grounded**,  
-   - **clear and concise**,  
+   - **specific**,
+   - **scientifically grounded**,
+   - **clear and concise**,
    - **actionable when needed**.
-2. For "what/why/how" questions:
-   - Provide a short explanation using the knowledge graph.
-3. **Do NOT**:
+3. For "what/why/how" questions:
+   - Provide a short explanation using the provided information.
+4. **Do NOT**:
    - Mention the knowledge graph itself.
-   - Say "I cannot confirm", "I cannot verify", or anything uncertain.
+   - Say "I cannot confirm" or be uncertain.
    - Add unrelated information.
    - Give unsafe chemical advice.
 
-
 ### Output Style
-- 2-4 sentences maximum.
-- No lists unless absolutely necessary.
-- Must sound like an agricultural expert answering a farmer.
+- If mismatch: 1-2 sentences informing the user of the mismatch.
+- If matched: 2-4 sentences maximum, expert tone.
+- Avoid lists unless absolutely necessary.
 
 Crop: {crop}
 Diagnosis: {disease}
@@ -86,9 +90,37 @@ Diagnosis: {disease}
 </context>
 
 Question: {question}
+
 Answer:
 """
 
+CYPHER_SUBGRAPH_H = """
+        MATCH (d:Entity)-[r:AFFECTS]->(c:Entity {name: $crop})
+        RETURN DISTINCT 
+            d.name AS disease,
+            type(r) AS relationship,
+            c.name AS crop
+        """
+CYPHER_SUBGRAPH_D =  """
+    MATCH (d:Entity {name: $disease})
+    OPTIONAL MATCH (d)-[rA:AFFECTS]->(c:Entity)
+    OPTIONAL MATCH (d)-[rPRESENTS:PRESENTS]->(s:Entity)
+    OPTIONAL MATCH (d)-[rPATHOGEN:CAUSED_BY]->(p:Entity)
+    OPTIONAL MATCH (d)-[rTREAT:TREATED_BY]->(t:Entity)
 
+    WITH 
+        COLLECT(DISTINCT d) +
+        COLLECT(DISTINCT c) +
+        COLLECT(DISTINCT s) +
+        COLLECT(DISTINCT p) +
+        COLLECT(DISTINCT t) AS nodes,
+        COLLECT(rA) + 
+        COLLECT(rPRESENTS) +
+        COLLECT(rPATHOGEN) + 
+        COLLECT(rTREAT) AS rels,
+        d
+
+    RETURN nodes, rels
+"""
 
 

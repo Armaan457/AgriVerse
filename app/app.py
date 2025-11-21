@@ -61,7 +61,7 @@ col1, col2 = st.columns([1, 2])
 with col1:
 	st.header("Input")
 
-	upload = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+	upload = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"])
 
 	selected = None
 	if upload is not None:
@@ -80,18 +80,17 @@ with col2:
 	subgraph_box = st.expander("Subgraph / Context (raw)")
 
 if run:
-	if selected is None:
-		st.error("Please upload an image.")
+	pil_img = None
+	if selected is not None:
+		try:
+			pil_img = Image.open(selected).convert("RGB")
+		except Exception as e:
+			st.error(f"Could not open image: {e}")
+			pil_img = None
 
-	# Load image
 	try:
-		pil_img = Image.open(selected).convert("RGB")
-	except Exception as e:
-		st.error(f"Could not open image: {e}")
-
-	try:
-		with st.spinner("Running pipeline (model + graph) ..."):
-			answer, subgraph = run_pipeline(selected, question)
+		with st.spinner("Running pipeline...."):
+			answer, subgraph = run_pipeline(question, selected)
 
 		answer_box.markdown("**Assistant answer**")
 		answer_box.write(answer)
@@ -105,27 +104,42 @@ if run:
 	except Exception as e:
 		st.error(f"Pipeline error: {e}")
 
-	try:
-		display_pil = get_display_image(pil_img, max_dim=640)
+		try:
+			if pil_img is not None:
+				display_pil = get_display_image(pil_img, max_dim=640)
 
-		if show_grad:
-			with st.spinner("Generating grad rollout (may take time)..."):
-				arr = np.array(pil_img)
-				probs = vision.predict_fn([arr])
-				pred_id = int(np.argmax(probs[0]))
+				last_selected = st.session_state.get("_last_selected", None)
+				last_question = st.session_state.get("_last_question", None)
 
-				heatmap = vision.generate_grad_rollout(vision.inference_model, vision.inference_processor, pil_img, pred_id)
+				should_run_vision = True
+				if last_selected == selected and last_question == question:
+					should_run_vision = False
 
-				overlay = overlay_heatmap_on_image(display_pil, heatmap, alpha=0.5)
+				if show_grad and should_run_vision:
+					with st.spinner("Generating grad rollout (may take time)..."):
+						arr = np.array(pil_img)
+						probs = vision.predict_fn([arr])
+						pred_id = int(np.argmax(probs[0]))
 
-			left, right = st.columns(2)
-			left.image(display_pil, caption="Original image (resized)", use_container_width=False, width=600)
-			right.image(overlay, caption="Grad rollout overlay (resized)", use_container_width=False, width=600)
-		else:
-			image_box.image(display_pil, caption="Input image (resized)", use_container_width=False, width=600)
+						heatmap = vision.generate_grad_rollout(vision.inference_model, vision.inference_processor, pil_img, pred_id)
 
-	except Exception as e:
-		st.warning(f"Could not generate/display grad rollout: {e}")
+						overlay = overlay_heatmap_on_image(display_pil, heatmap, alpha=0.5)
+
+					left, right = st.columns(2)
+					left.image(display_pil, caption="Original image (resized)", use_container_width=False, width=600)
+					right.image(overlay, caption="Grad rollout overlay (resized)", use_container_width=False, width=600)
+
+					st.session_state["_last_selected"] = selected
+					st.session_state["_last_question"] = question
+				else:
+					image_box.image(display_pil, caption="Input image (resized)", use_container_width=False, width=600)
+
+					st.session_state["_last_selected"] = selected
+					st.session_state["_last_question"] = question
+			else:
+				image_box.info("No image provided. Running text/graph pipeline only.")
+		except Exception as e:
+			st.warning(f"Could not generate/display grad rollout: {e}")
 
 
 
