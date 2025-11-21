@@ -5,3 +5,4 @@ env
 processed_cddm
 Models
 Results
+__pycache__
