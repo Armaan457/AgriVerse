@@ -34,7 +34,6 @@ def run_pipeline(query, image=None):
         print(f"[VISION] Predicted: {predicted_class_name}")
 
         crop, dis = predicted_class_name.split(',')
-        print(f"[TEXT] Crop={crop}, Disease={dis}")
         if dis.lower() == "healthy":
             CYPHER_SUBGRAPH = CYPHER_SUBGRAPH_H
             subgraph = graph.query(CYPHER_SUBGRAPH, params={"disease": dis, "crop" : crop })
@@ -56,7 +55,7 @@ def run_pipeline(query, image=None):
         crop, dis = extract_from_text(
             query
         )
-        print(f"[DETECTED] Crop={crop}, Disease={dis}")
+        print(f"[TEXT] Crop={crop}, Disease={dis}")
         if dis.lower() == "healthy":
             CYPHER_SUBGRAPH = CYPHER_SUBGRAPH_H
             subgraph = graph.query(CYPHER_SUBGRAPH, params={"crop" : crop })
