@@ -69,7 +69,11 @@ with col1:
 
 	question = st.text_area("Question for the assistant", "What is likely causing this disease and suggested actions?")
 
-	show_grad = st.checkbox("Show Grad Rollout overlay")
+	# Only show the grad rollout option if an image has been uploaded
+	if selected is not None:
+		show_grad = st.checkbox("Show Grad Rollout overlay")
+	else:
+		show_grad = False
 
 	run = st.button("Run pipeline")
 
@@ -104,42 +108,43 @@ if run:
 	except Exception as e:
 		st.error(f"Pipeline error: {e}")
 
-		try:
-			if pil_img is not None:
-				display_pil = get_display_image(pil_img, max_dim=640)
+	# Display image and optionally generate grad rollout regardless of pipeline success
+	try:
+		if pil_img is not None:
+			display_pil = get_display_image(pil_img, max_dim=640)
 
-				last_selected = st.session_state.get("_last_selected", None)
-				last_question = st.session_state.get("_last_question", None)
+			last_selected = st.session_state.get("_last_selected", None)
+			last_question = st.session_state.get("_last_question", None)
 
-				should_run_vision = True
-				if last_selected == selected and last_question == question:
-					should_run_vision = False
+			should_run_vision = True
+			if last_selected == selected and last_question == question:
+				should_run_vision = False
 
-				if show_grad and should_run_vision:
-					with st.spinner("Generating grad rollout (may take time)..."):
-						arr = np.array(pil_img)
-						probs = vision.predict_fn([arr])
-						pred_id = int(np.argmax(probs[0]))
+			if show_grad and should_run_vision:
+				with st.spinner("Generating grad rollout (may take time)..."):
+					arr = np.array(pil_img)
+					probs = vision.predict_fn([arr])
+					pred_id = int(np.argmax(probs[0]))
 
-						heatmap = vision.generate_grad_rollout(vision.inference_model, vision.inference_processor, pil_img, pred_id)
+					heatmap = vision.generate_grad_rollout(vision.inference_model, vision.inference_processor, pil_img, pred_id)
 
-						overlay = overlay_heatmap_on_image(display_pil, heatmap, alpha=0.5)
+				overlay = overlay_heatmap_on_image(display_pil, heatmap, alpha=0.5)
 
-					left, right = st.columns(2)
-					left.image(display_pil, caption="Original image (resized)", use_container_width=False, width=600)
-					right.image(overlay, caption="Grad rollout overlay (resized)", use_container_width=False, width=600)
+				left, right = st.columns(2)
+				left.image(display_pil, caption="Original image (resized)", use_container_width=False, width=600)
+				right.image(overlay, caption="Grad rollout overlay (resized)", use_container_width=False, width=600)
 
-					st.session_state["_last_selected"] = selected
-					st.session_state["_last_question"] = question
-				else:
-					image_box.image(display_pil, caption="Input image (resized)", use_container_width=False, width=600)
-
-					st.session_state["_last_selected"] = selected
-					st.session_state["_last_question"] = question
+				st.session_state["_last_selected"] = selected
+				st.session_state["_last_question"] = question
 			else:
-				image_box.info("No image provided. Running text/graph pipeline only.")
-		except Exception as e:
-			st.warning(f"Could not generate/display grad rollout: {e}")
+				image_box.image(display_pil, caption="Input image (resized)", use_container_width=False, width=600)
+
+				st.session_state["_last_selected"] = selected
+				st.session_state["_last_question"] = question
+		else:
+			image_box.info("No image provided. Running text/graph pipeline only.")
+	except Exception as e:
+		st.warning(f"Could not generate/display grad rollout: {e}")
 
 
 
