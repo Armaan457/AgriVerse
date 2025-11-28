@@ -108,7 +108,6 @@ if run:
 	except Exception as e:
 		st.error(f"Pipeline error: {e}")
 
-	# Display image and optionally generate grad rollout regardless of pipeline success
 	try:
 		if pil_img is not None:
 			display_pil = get_display_image(pil_img, max_dim=640)
@@ -131,18 +130,17 @@ if run:
 				overlay = overlay_heatmap_on_image(display_pil, heatmap, alpha=0.5)
 
 				left, right = st.columns(2)
-				left.image(display_pil, caption="Original image (resized)", use_container_width=False, width=600)
-				right.image(overlay, caption="Grad rollout overlay (resized)", use_container_width=False, width=600)
+				left.image(display_pil, caption="Original image", use_container_width=False, width=600)
+				right.image(overlay, caption="Grad rollout overlay", use_container_width=False, width=600)
 
 				st.session_state["_last_selected"] = selected
 				st.session_state["_last_question"] = question
 			else:
-				image_box.image(display_pil, caption="Input image (resized)", use_container_width=False, width=600)
+				image_box.image(display_pil, caption="Input image", use_container_width=False, width=600)
 
 				st.session_state["_last_selected"] = selected
 				st.session_state["_last_question"] = question
-		else:
-			image_box.info("No image provided. Running text/graph pipeline only.")
+
 	except Exception as e:
 		st.warning(f"Could not generate/display grad rollout: {e}")
 

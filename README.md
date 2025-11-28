@@ -2,6 +2,8 @@
 
 A **compact, research grade AI system** for diagnosing plant leaf diseases and providing **knowledge grounded agricultural guidance**. This system blends **computer vision**, **large language models**, and **knowledge graphs** to deliver accurate, explainable, and context aware plant disease assistance.
 
+**Project Report: [Drive Link](https://drive.google.com/file/d/1ahonuMstKYbAAIc_6h5e4UggXNdZl13j/view?usp=sharing)**
+
 ---
 
 ## Overview

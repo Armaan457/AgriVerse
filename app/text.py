@@ -57,6 +57,8 @@ def run_pipeline(query, image=None):
         )
         print(f"[TEXT] Crop={crop}, Disease={dis}")
         if dis.lower() == "healthy":
+            if crop is None:
+                return "Insufficient information to answer your question.", []
             CYPHER_SUBGRAPH = CYPHER_SUBGRAPH_H
             subgraph = graph.query(CYPHER_SUBGRAPH, params={"crop" : crop })
         else:
@@ -122,12 +124,12 @@ def extract_from_text(query):
 
     if not crop:
         match = process.extractOne(query, CROPS, scorer=fuzz.partial_ratio)
-        if match and match[1] >= 80:
+        if match and match[1] >= 90:
             crop = match[0]
 
     if not disease:
         match = process.extractOne(query, DISEASES, scorer=fuzz.partial_ratio)
-        if match and match[1] >= 80:
+        if match and match[1] >= 90:
             disease = match[0]
 
     if not disease: 
