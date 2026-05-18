@@ -2,8 +2,6 @@
 
 A **compact, research grade AI system** for diagnosing plant leaf diseases and providing **knowledge grounded agricultural guidance**. This system blends **computer vision**, **large language models**, and **knowledge graphs** to deliver accurate, explainable, and context aware plant disease assistance.
 
-**Project Report: [Drive Link](https://drive.google.com/file/d/1ahonuMstKYbAAIc_6h5e4UggXNdZl13j/view?usp=sharing)**
-
 ---
 
 ## Overview
@@ -67,11 +65,15 @@ Once the disease/crop are known:
 
 ### Vision Model Performance
 
-* **Accuracy**: *99%*
-* **Precision**: *99%*
-* **Recall**: *99%*
-* **F1 Score**: *99%*
+| Metric | Score |
+|--------|--------|
+| Accuracy | 99% |
+| Precision | 99% |
+| Recall | 99% |
+| F1 Score | 99% |
 
 ### Final Output Correctness
 
-* Using LLM as a judge system: *9.1/10*
+| Evaluation Method | Score |
+|------------------|--------|
+| LLM-as-a-Judge | 9.1/10 |
