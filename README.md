@@ -8,7 +8,7 @@ An end-to-end AI-powered crop disease diagnosis and agricultural assistant that 
 
 ## Key Features
 
-- Diagnose plant diseases from leaf images
+- Diagnose plant diseases from images
 - Answer agricultural queries using natural language
 - Knowledge graph grounded responses 
 - Explainable predictions with Grad-CAM visualizations
@@ -46,3 +46,12 @@ An end-to-end AI-powered crop disease diagnosis and agricultural assistant that 
 Scored on four dimensions: **Faithfulness** (consistency with the knowledge graph), **Scientific Correctness**, **Completeness**, and **Hallucination Control**.
 
 ---
+
+## Dataset
+
+Trained on a large-scale crop disease dataset comprising **130000+ images, 16 crop species and 33 disease categories**.
+
+## Tech Stack
+
+Built with **PyTorch** and **Hugging Face Transformers** using a fine-tuned **Vision Transformer (ViT)**. Responses are grounded through a **Neo4j Knowledge Graph** queried using the **Cypher Query Language**, with **Grad-CAM** for visual explainability.
+
