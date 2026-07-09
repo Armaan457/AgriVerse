@@ -1,79 +1,48 @@
-# Multimodal Crop Assistant
+# 🌿 AgriVerse
 
-A **compact, research grade AI system** for diagnosing plant leaf diseases and providing **knowledge grounded agricultural guidance**. This system blends **computer vision**, **large language models**, and **knowledge graphs** to deliver accurate, explainable, and context aware plant disease assistance.
+An end-to-end AI-powered crop disease diagnosis and agricultural assistant that combines **computer vision**, **knowledge graphs**, and **large language models** to deliver accurate, explainable, and scientifically grounded recommendations for farmers.
 
----
-
-## Overview
-
-The Assistant allows users to upload a leaf image or simply ask a question about a crop.
-The system then:
-
-1. **Identifies the crop and potential disease** (from image or text).
-2. **Retrieves scientific facts** from a structured knowledge graph.
-3. **Generates a grounded, evidence-based answer** using an LLM.
-4. **(Optional)** Produces explainability heatmaps showing areas influencing the model’s decision.
-
-## Core Pipeline
-
-### Vision/Text Diagnosis Component
-
-#### **Image Input**
-
-A trained vision model classifies the leaf image into:
-
-  * **Crop type**
-  * **Disease**
-
-* Optionally generates **Grad-CAM heatmaps**
-
-#### **Text Only Input**
-
-If no image is provided:
-
-* A **fuzzy matching algorithm** extracts crop and disease mentions from the user’s query.
+**Live Demo:** [Try AgriVerse](https://huggingface.co/spaces/Armaan457/AgriVerse)
 
 ---
 
-### Knowledge Grounded QA Component
+## Key Features
 
-Once the disease/crop are known:
-
-1. **Neo4j Knowledge Graph Query**
-
-   Retrieves nodes such as:
-
-     * Disease symptoms
-     * Causal pathogens
-     * Affected crops
-     * Available treatments
-
-   Along with their relationships
-   
-2. **LLM Answer Synthesis**
-
-    The language model receives:
-    * User question
-    * Predicted crop/disease
-    * Structured facts from the graph
-   
-   This Produces a **precise, scientifically grounded answer**.
+- Diagnose plant diseases from leaf images
+- Answer agricultural queries using natural language
+- Knowledge graph grounded responses 
+- Explainable predictions with Grad-CAM visualizations
+- Supports both image-based and text-only interactions
 
 ---
 
-## Evaluation Results
 
-### Vision Model Performance
+## Project Highlights
+
+- Achieved **99% classification accuracy** on plant disease detection.
+- Combines **vision models, knowledge graphs, and LLMs** into a single multimodal pipeline.
+- Generates **grounded responses** using structured agricultural knowledge instead of relying solely on LLM reasoning.
+- Provides **visual explanations** through Grad-CAM for improved model interpretability.
+
+---
+
+## Model Performance
+
+### Disease Classification
 
 | Metric | Score |
-|--------|--------|
+|---------|------:|
 | Accuracy | 99% |
 | Precision | 99% |
 | Recall | 99% |
 | F1 Score | 99% |
 
-### Final Output Correctness
+### End-to-End Response Quality
 
-| Evaluation Method | Score |
-|------------------|--------|
-| LLM-as-a-Judge | 9.1/10 |
+| Evaluation | Score |
+|------------|------:|
+| LLM-as-a-Judge | 9.1 / 10 |
+
+Scored on four dimensions: **Faithfulness** (consistency with the knowledge graph), **Scientific Correctness**, **Completeness**, and **Hallucination Control**.
+
+---
